@@ -130,7 +130,7 @@ def get_shared_stargazsers_repositories(user: str, repository: str, start_page: 
 
     stargazers_ids = set((user.id for user in repo.starred_by))
 
-    logging.getLogger(__name__).debug("stargazers_ids: ", stargazers_ids)
+    logging.getLogger(__name__).info("stargazers_ids: ", stargazers_ids)
 
     # TODO: make the subquery function
     # starred_users = session.query(user_stared_repositories.c.user_id)\
@@ -150,8 +150,6 @@ def get_shared_stargazsers_repositories(user: str, repository: str, start_page: 
 
     result = collections.defaultdict(list)
     for repo_id, repo_name, user_name in shared_repos:
-        logging.error(str(repo_id) + str(repo_name) + str(user_name))
         # TODO: use user_id instead of user_name to save network, then use a redis cache to retrieve user name
         result[repo_name].append(user_name)
-    logging.error(result)
     return result
