@@ -1,0 +1,46 @@
+networks:
+  stargazers_network:
+    name: stargazers_network
+
+services:
+
+  stargazers_server:
+    image: my/stargazers_server
+    build:
+      context: .
+      dockerfile: docker/server/Dockerfile
+    depends_on:
+      - db
+    environment:
+      - DB_CONNECTION_STRING=postgresql://stargazers:password@db/stargazers
+      - STARGAZERS_OWNER=xlqian
+      - STARGAZERS_REPO=navitia
+      - STARGAZERS_GITHUB_TOKEN=toto
+    networks:
+      - stargazers_network
+    ports:
+      - 5000:5000
+
+
+  redis:
+    image: redis:6-alpine
+    networks:
+      - stargazers_network
+    ports:
+      - 6379:6379
+
+  db:
+     image: my/stargazers_db
+     build:
+       context: docker/db
+       dockerfile: Dockerfile
+     networks:
+       - stargazers_network
+     ports:
+      - 5432:5432
+     #volumes:
+     # - pgdata:/var/lib/postgresql/data
+     environment:
+      - POSTGRES_USER=stargazers
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=stargazers
