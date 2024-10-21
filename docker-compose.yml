@@ -13,9 +13,9 @@ services:
       - db
     environment:
       - DB_CONNECTION_STRING=postgresql://stargazers:password@db/stargazers
-      - STARGAZERS_OWNER=xlqian
-      - STARGAZERS_REPO=navitia
-      - STARGAZERS_GITHUB_TOKEN=toto
+      - STARGAZERS_OWNER=${STARGAZERS_OWNER}
+      - STARGAZERS_REPO=${STARGAZERS_REPO}
+      - STARGAZERS_GITHUB_TOKEN=${STARGAZERS_GITHUB_TOKEN}
     networks:
       - stargazers_network
     ports:

@@ -21,7 +21,7 @@ sleep(5)
 # create_sample_db()
 # TODO: should be done properly in an another docker with schema migration...
 create_db()
-# TODO: Asynchronous worker to fill the db?
+# TODO: move it into a proper worker/docker, Asynchronous worker to fill/update the db?
 from .github_crawler import fill_db
 import os
 owner = os.environ.get('STARGAZERS_OWNER') or "xlqian"

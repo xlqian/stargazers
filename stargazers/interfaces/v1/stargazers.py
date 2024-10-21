@@ -10,7 +10,6 @@ class StarGazers(Resource):
 
     routes = ["/stargazers/<user>/<repository>", ]
 
-    # serialization
     def get(self, user, repository):
         parser = reqparse.RequestParser()
         # argument

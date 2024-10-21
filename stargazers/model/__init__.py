@@ -8,9 +8,21 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
+from contextlib import contextmanager
+import time
+
+
+@contextmanager
+def timed_logger(action_name):
+    logger = logging.getLogger(__name__)
+    start = time.time()
+    yield
+    end = time.time()
+    logger.info(f"it took {end - start}ms to finish {action_name}")
+
 
 def make_engine():
-    db_connection_string = os.environ.get('DB_CONNECTION_STRING') or "postgresql://stargazers:password@db/stargazers"
+    db_connection_string = os.environ.get('DB_CONNECTION_STRING')
     return create_engine(db_connection_string)
 
 
@@ -130,23 +142,23 @@ def get_shared_stargazsers_repositories(user: str, repository: str, start_page: 
 
     stargazers_ids = set((user.id for user in repo.starred_by))
 
-    logging.getLogger(__name__).info("stargazers_ids: ", stargazers_ids)
-
     # TODO: make the subquery function
     # starred_users = session.query(user_stared_repositories.c.user_id)\
     #    .filter(user_stared_repositories.c.repository_id == repo.id)\
     #    .subquery()
 
+    # TODO: critical part, add monitoring
     # Find all other repositories starred by these users
-    shared_repos = session.query(
-        Repository.id,
-        Repository.name,
-        User.user_name
-    ).join(user_stared_repositories, Repository.id == user_stared_repositories.c.repository_id)\
-     .join(User, User.id == user_stared_repositories.c.user_id)\
-     .filter(Repository.id != repo.id)\
-     .filter(user_stared_repositories.c.user_id.in_(stargazers_ids))\
-     .all()
+    with timed_logger("get shared stargazers"):
+        shared_repos = session.query(
+            Repository.id,
+            Repository.name,
+            User.user_name
+        ).join(user_stared_repositories, Repository.id == user_stared_repositories.c.repository_id)\
+         .join(User, User.id == user_stared_repositories.c.user_id)\
+         .filter(Repository.id != repo.id)\
+         .filter(user_stared_repositories.c.user_id.in_(stargazers_ids))\
+         .all()
 
     result = collections.defaultdict(list)
     for repo_id, repo_name, user_name in shared_repos:
