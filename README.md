@@ -11,5 +11,4 @@ then in the browser:
 
 http://localhost:5000/v1/stargazers/owner/repo
 
-todo use graph db?
-
+todo use graph db? (dijkastra)
